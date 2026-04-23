@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Præsentationsstruktur — Stine</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --warm-brown: #3D2B1F;
+    --terracotta: #C4614A;
+    --dusty-sage: #7A9E8E;
+    --gold: #C9973B;
+    --light-sage: #EAF0ED;
+    --border: #D8CFC4;
+    --text-muted: #8A7D73;
+    --slide-bg: #FDFAF6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--warm-brown);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .tagline {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .back-link {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--terracotta); }
+
+  .dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 0;
+    overflow: hidden;
+    height: calc(100vh - 73px);
+  }
+
+  .panel {
+    padding: 32px 36px;
+    overflow-y: auto;
+  }
+
+  .panel-left { border-right: 1px solid var(--border); }
+
+  .panel-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  .field-group { margin-bottom: 20px; }
+
+  label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    margin-bottom: 7px;
+    letter-spacing: 0.01em;
+  }
+
+  textarea, select, input[type="text"] {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    color: var(--warm-brown);
+    transition: border-color 0.2s;
+    outline: none;
+    resize: none;
+  }
+  textarea:focus, select:focus, input:focus { border-color: var(--dusty-sage); }
+  textarea { line-height: 1.6; }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7D73' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+  }
+
+  /* Drop zone */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    position: relative;
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--dusty-sage);
+    background: var(--light-sage);
+  }
+  .drop-zone input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .drop-zone .dz-icon { font-size: 1.8rem; margin-bottom: 8px; }
+  .drop-zone .dz-text { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
+  .drop-zone .dz-text strong { color: var(--warm-brown); font-weight: 500; display: block; margin-bottom: 2px; }
+
+  .file-preview {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    background: var(--light-sage);
+    border: 1px solid #C2D6CC;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: #4A7060;
+  }
+  .file-preview.visible { display: flex; }
+  .file-preview .fname { flex: 1; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .file-preview .remove-file { cursor: pointer; color: var(--text-muted); font-size: 1rem; line-height: 1; flex-shrink: 0; }
+  .file-preview .remove-file:hover { color: var(--terracotta); }
+
+  .generate-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--warm-brown);
+    color: var(--cream);
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .generate-btn:hover { background: var(--terracotta); }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .loading-dots { display: none; align-items: center; gap: 5px; }
+  .loading-dots.visible { display: flex; }
+  .loading-dots span {
+    width: 5px; height: 5px; background: var(--cream); border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100% { transform:translateY(0); } 30% { transform:translateY(-4px); } }
+
+  /* Right panel */
+  .placeholder-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; text-align: center; color: var(--text-muted); gap: 12px;
+  }
+  .placeholder-state .icon { font-size: 2.5rem; opacity: 0.3; }
+  .placeholder-state p { font-size: 0.85rem; font-family: 'Fraunces', serif; font-style: italic; font-weight: 300; }
+
+  .output-area { display: none; animation: fadeIn 0.4s ease; }
+  .output-area.visible { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Presentation title block */
+  .pres-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .pres-label {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--text-muted); font-weight: 500; margin-bottom: 8px;
+  }
+  .pres-title {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 1.4rem;
+    letter-spacing: -0.02em; color: var(--warm-brown); line-height: 1.3; margin-bottom: 6px;
+  }
+  .pres-meta {
+    font-size: 0.78rem; color: var(--text-muted); font-weight: 300;
+  }
+
+  /* Slides */
+  .slides-container { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+
+  .slide-card {
+    background: var(--slide-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    position: relative;
+    transition: box-shadow 0.2s;
+  }
+  .slide-card:hover { box-shadow: 0 3px 14px rgba(61,43,31,0.07); }
+
+  .slide-number {
+    font-size: 0.68rem; font-weight: 500; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .slide-type-badge {
+    padding: 2px 8px; border-radius: 10px; font-size: 0.65rem;
+    font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .badge-intro { background: #FDE8E4; color: #A04535; }
+  .badge-context { background: #FEF3DC; color: #8A6020; }
+  .badge-main { background: var(--light-sage); color: #3D7060; }
+  .badge-action { background: #E8EDF5; color: #3A5080; }
+  .badge-close { background: #F0EBE3; color: var(--text-muted); }
+
+  .slide-title {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 1rem;
+    letter-spacing: -0.01em; margin-bottom: 10px; line-height: 1.3;
+  }
+
+  .slide-points { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .slide-points li {
+    font-size: 0.82rem; color: var(--warm-brown); line-height: 1.5;
+    padding-left: 14px; position: relative; font-weight: 300;
+  }
+  .slide-points li::before {
+    content: '–'; position: absolute; left: 0; color: var(--text-muted);
+  }
+
+  .slide-note {
+    margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);
+    font-size: 0.75rem; color: var(--text-muted); font-style: italic;
+    line-height: 1.5; font-family: 'Fraunces', serif; font-weight: 300;
+  }
+
+  .output-actions {
+    display: flex; gap: 10px; padding-top: 20px; border-top: 1px solid var(--border);
+  }
+  .action-btn {
+    flex: 1; padding: 10px; border-radius: 7px; border: 1px solid var(--border);
+    background: white; font-family: 'DM Sans', sans-serif; font-size: 0.78rem;
+    font-weight: 500; color: var(--warm-brown); cursor: pointer; transition: all 0.15s;
+  }
+  .action-btn:hover { border-color: var(--dusty-sage); background: var(--light-sage); }
+  .action-btn.copied { background: var(--dusty-sage); border-color: var(--dusty-sage); color: white; }
+
+  .persona-note {
+    background: var(--light-sage); border: 1px solid #C2D6CC; border-radius: 8px;
+    padding: 11px 14px; margin-bottom: 20px; font-size: 0.78rem; color: #4A7060; line-height: 1.5;
+  }
+  .persona-note strong {
+    display: block; margin-bottom: 3px; font-size: 0.7rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  @media (max-width: 760px) {
+    main { grid-template-columns: 1fr; height: auto; }
+    .panel-left { border-right: none; border-bottom: 1px solid var(--border); }
+    header { padding: 16px 20px; }
+    .panel { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1><span class="dot"></span>Præsentationsstruktur</h1>
+    <span class="tagline">Organiserer dine noter</span>
+  </div>
+  <a href="index.html" class="back-link">← Tilbage</a>
+</header>
+
+<main>
+  <!-- LEFT -->
+  <div class="panel panel-left">
+    <div class="panel-label"><span class="dot" style="background:var(--gold)"></span>Dine noter</div>
+
+    <div class="persona-note">
+      <strong>Tilpasset din stil</strong>
+      Klar struktur · Direkte budskaber · Fokus på resultater og handling
+    </div>
+
+    <div class="field-group">
+      <label>Præsentationens formål</label>
+      <select id="purpose">
+        <option value="update">Statusopdatering til ledelsen</option>
+        <option value="proposal">Forslag / idé til godkendelse</option>
+        <option value="results">Resultater og indsigter</option>
+        <option value="strategy">Strategi eller plan</option>
+        <option value="kickoff">Projekt-kickoff til teamet</option>
+        <option value="retrospective">Evaluering / retrospektiv</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label>Målgruppe</label>
+      <select id="audience">
+        <option value="leadership">Ledelse / direktion</option>
+        <option value="team">Mit team</option>
+        <option value="crossteam">Tværgående teams</option>
+        <option value="stakeholders">Interne interessenter</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label>Antal slides <span style="color:var(--text-muted);font-weight:300">(ca.)</span></label>
+      <select id="slidecount">
+        <option value="5">5 slides — kort og præcis</option>
+        <option value="8" selected>8 slides — standard</option>
+        <option value="12">12 slides — detaljeret</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label>Upload noter eller tekst</label>
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".txt,.md,.pdf,.docx" />
+        <div class="dz-icon">📄</div>
+        <div class="dz-text">
+          <strong>Klik for at vælge fil</strong>
+          .txt, .md, .pdf eller .docx
+        </div>
+      </div>
+      <div class="file-preview" id="filePreview">
+        <span>📎</span>
+        <span class="fname" id="fileName"></span>
+        <span class="remove-file" onclick="removeFile()">✕</span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Eller skriv/indsæt noter direkte</label>
+      <textarea id="notesText" rows="6" placeholder="Indsæt dine rånoter, bullet points, tal, indsigter — hvad som helst. Claude organiserer det."></textarea>
+    </div>
+
+    <button class="generate-btn" id="generateBtn" onclick="generateStructure()">
+      <span id="btn-label">Byg præsentationsstruktur</span>
+      <div class="loading-dots" id="loading"><span></span><span></span><span></span></div>
+    </button>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="panel panel-right">
+    <div class="panel-label"><span class="dot" style="background:var(--dusty-sage)"></span>Din struktur</div>
+
+    <div class="placeholder-state" id="placeholder">
+      <div class="icon">📐</div>
+      <p>Upload noter til venstre<br>— så bygger jeg strukturen</p>
+    </div>
+
+    <div class="output-area" id="outputArea">
+      <div class="pres-header">
+        <div class="pres-label">Præsentation</div>
+        <div class="pres-title" id="presTitle"></div>
+        <div class="pres-meta" id="presMeta"></div>
+      </div>
+
+      <div class="slides-container" id="slidesContainer"></div>
+
+      <div class="output-actions">
+        <button class="action-btn" id="copyBtn" onclick="copyAll()">Kopiér som tekst</button>
+        <button class="action-btn" onclick="generateStructure()">Prøv igen</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  let fileContent = '';
+
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+  function handleFile(file) {
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('filePreview').classList.add('visible');
+    const reader = new FileReader();
+    reader.onload = e => { fileContent = e.target.result; };
+    reader.readAsText(file);
+  }
+
+  function removeFile() {
+    fileContent = '';
+    fileInput.value = '';
+    document.getElementById('filePreview').classList.remove('visible');
+    document.getElementById('fileName').textContent = '';
+  }
+
+  const badgeMap = {
+    intro: 'badge-intro', åbning: 'badge-intro', opening: 'badge-intro',
+    context: 'badge-context', kontekst: 'badge-context', baggrund: 'badge-context',
+    main: 'badge-main', indhold: 'badge-main', analyse: 'badge-main', resultater: 'badge-main', data: 'badge-main',
+    action: 'badge-action', handling: 'badge-action', næste: 'badge-action', anbefaling: 'badge-action',
+    close: 'badge-close', afslutning: 'badge-close', opsummering: 'badge-close'
+  };
+
+  function getBadgeClass(type) {
+    const t = (type || '').toLowerCase();
+    for (const [key, cls] of Object.entries(badgeMap)) {
+      if (t.includes(key)) return cls;
+    }
+    return 'badge-main';
+  }
+
+  const purposeLabels = {
+    update: 'statusopdatering til ledelsen',
+    proposal: 'forslag eller idé til godkendelse',
+    results: 'præsentation af resultater og indsigter',
+    strategy: 'strategi eller plan',
+    kickoff: 'projekt-kickoff til teamet',
+    retrospective: 'evaluering eller retrospektiv'
+  };
+
+  const audienceLabels = {
+    leadership: 'ledelse og direktion',
+    team: 'mit team',
+    crossteam: 'tværgående teams',
+    stakeholders: 'interne interessenter'
+  };
+
+  async function generateStructure() {
+    const notes = document.getElementById('notesText').value.trim();
+    const content = fileContent || notes;
+
+    if (!content) {
+      document.getElementById('notesText').focus();
+      return;
+    }
+
+    const purpose = document.getElementById('purpose').value;
+    const audience = document.getElementById('audience').value;
+    const slidecount = document.getElementById('slidecount').value;
+
+    const btn = document.getElementById('generateBtn');
+    document.getElementById('btn-label').style.display = 'none';
+    document.getElementById('loading').classList.add('visible');
+    btn.disabled = true;
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('outputArea').classList.remove('visible');
+
+    const systemPrompt = `Du er en assistent for Stine Franck Jensen, Marketing Manager. Du hjælper hende med at strukturere præsentationer til interne møder.
+
+Stines præsentationsstil:
+- Direkte og klar — ingen unødvendig fyld
+- Starter med det vigtigste (hvad og hvorfor)
+- Resultatorienteret — altid med klare konklusioner og næste skridt
+- Varm men professionel — ikke kold eller robotagtig
+- Præcis og kvalitetsbevidst — hellere færre slides med substans end mange tynde
+
+Outputformat — returner KUN valid JSON, ingen markdown backticks:
+{
+  "title": "præsentationens titel",
+  "meta": "X slides · Formål · Målgruppe",
+  "slides": [
+    {
+      "number": 1,
+      "type": "Intro",
+      "title": "slide titel",
+      "points": ["bullet 1", "bullet 2", "bullet 3"],
+      "note": "Talenotat til Stine: hvad hun bør sige/betone her"
+    }
+  ]
+}
+
+Type-værdier (brug én af disse): Intro, Kontekst, Analyse, Resultater, Anbefaling, Handling, Afslutning
+Hvert slide har 2–4 korte, præcise bullet points. Talenotater er praktiske og direkte — som en god kollega der coacher hende.`;
+
+    const userPrompt = `Formål: ${purposeLabels[purpose]}
+Målgruppe: ${audienceLabels[audience]}
+Antal slides: ${slidecount}
+
+Her er Stines noter:
+---
+${content.slice(0, 4000)}
+---
+
+Byg en klar præsentationsstruktur baseret på disse noter. Organiser indholdet logisk, fremhæv det vigtigste og sørg for at slutte med klare handlingspunkter.`;
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }]
+        })
+      });
+
+      const data = await response.json();
+      const text = data.content.map(i => i.text || '').join('');
+      const clean = text.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+
+      document.getElementById('presTitle').textContent = parsed.title;
+      document.getElementById('presMeta').textContent = parsed.meta;
+
+      const container = document.getElementById('slidesContainer');
+      container.innerHTML = '';
+
+      parsed.slides.forEach(slide => {
+        const card = document.createElement('div');
+        card.className = 'slide-card';
+
+        const badgeCls = getBadgeClass(slide.type);
+        const pointsHtml = (slide.points || []).map(p => `<li>${p}</li>`).join('');
+        const noteHtml = slide.note ? `<div class="slide-note">💬 ${slide.note}</div>` : '';
+
+        card.innerHTML = `
+          <div class="slide-number">
+            Slide ${slide.number}
+            <span class="slide-type-badge ${badgeCls}">${slide.type}</span>
+          </div>
+          <div class="slide-title">${slide.title}</div>
+          <ul class="slide-points">${pointsHtml}</ul>
+          ${noteHtml}
+        `;
+        container.appendChild(card);
+      });
+
+      document.getElementById('outputArea').classList.add('visible');
+      document.getElementById('copyBtn').textContent = 'Kopiér som tekst';
+      document.getElementById('copyBtn').classList.remove('copied');
+
+    } catch (err) {
+      document.getElementById('placeholder').style.display = 'flex';
+      alert('Noget gik galt. Prøv igen.');
+    } finally {
+      btn.disabled = false;
+      document.getElementById('btn-label').style.display = 'inline';
+      document.getElementById('loading').classList.remove('visible');
+    }
+  }
+
+  function copyAll() {
+    const title = document.getElementById('presTitle').textContent;
+    const meta = document.getElementById('presMeta').textContent;
+    const cards = document.querySelectorAll('.slide-card');
+    let text = `${title}\n${meta}\n\n`;
+    cards.forEach(card => {
+      const num = card.querySelector('.slide-number')?.childNodes[0]?.textContent?.trim() || '';
+      const type = card.querySelector('.slide-type-badge')?.textContent || '';
+      const t = card.querySelector('.slide-title')?.textContent || '';
+      const points = [...card.querySelectorAll('.slide-points li')].map(li => `  – ${li.textContent}`).join('\n');
+      const note = card.querySelector('.slide-note')?.textContent || '';
+      text += `${num} [${type}]\n${t}\n${points}\n${note ? note + '\n' : ''}\n`;
+    });
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ Kopieret';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Kopiér som tekst'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>

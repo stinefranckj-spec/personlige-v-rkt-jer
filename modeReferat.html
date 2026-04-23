@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mødereferat — Stine</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --warm-brown: #3D2B1F;
+    --terracotta: #C4614A;
+    --dusty-sage: #7A9E8E;
+    --gold: #C9973B;
+    --light-sage: #EAF0ED;
+    --border: #D8CFC4;
+    --text-muted: #8A7D73;
+    --blue-accent: #4A6FA5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--warm-brown);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-left { display: flex; align-items: baseline; gap: 14px; }
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300; font-size: 1.5rem; letter-spacing: -0.02em;
+  }
+  .tagline { font-size: 0.8rem; color: var(--text-muted); font-weight: 300; letter-spacing: 0.08em; text-transform: uppercase; }
+  .back-link { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color 0.2s; }
+  .back-link:hover { color: var(--terracotta); }
+  .dot { width: 8px; height: 8px; background: var(--blue-accent); border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    height: calc(100vh - 73px);
+    overflow: hidden;
+  }
+
+  .panel { padding: 32px 36px; overflow-y: auto; }
+  .panel-left { border-right: 1px solid var(--border); }
+
+  .panel-label {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--text-muted); font-weight: 500; margin-bottom: 20px;
+    display: flex; align-items: center;
+  }
+
+  .field-group { margin-bottom: 20px; }
+  label { display: block; font-size: 0.78rem; font-weight: 500; margin-bottom: 7px; }
+
+  textarea, select, input[type="text"] {
+    width: 100%; background: white; border: 1px solid var(--border);
+    border-radius: 8px; padding: 11px 14px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+    color: var(--warm-brown); transition: border-color 0.2s;
+    outline: none; resize: none; line-height: 1.6;
+  }
+  textarea:focus, select:focus, input:focus { border-color: var(--dusty-sage); }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7D73' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center; cursor: pointer;
+  }
+
+  /* Input mode tabs */
+  .mode-tabs { display: flex; gap: 0; margin-bottom: 20px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .mode-tab {
+    flex: 1; padding: 9px; background: white; border: none;
+    font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 500;
+    color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+    border-right: 1px solid var(--border);
+  }
+  .mode-tab:last-child { border-right: none; }
+  .mode-tab.active { background: var(--warm-brown); color: white; }
+
+  .input-panel { display: none; }
+  .input-panel.visible { display: block; }
+
+  /* Drop zone */
+  .drop-zone {
+    border: 2px dashed var(--border); border-radius: 10px;
+    padding: 28px 20px; text-align: center; cursor: pointer;
+    transition: all 0.2s; background: white; position: relative;
+  }
+  .drop-zone:hover, .drop-zone.dragover { border-color: var(--dusty-sage); background: var(--light-sage); }
+  .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .drop-zone .dz-icon { font-size: 1.8rem; margin-bottom: 8px; }
+  .drop-zone .dz-text { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
+  .drop-zone .dz-text strong { color: var(--warm-brown); font-weight: 500; display: block; margin-bottom: 2px; }
+
+  .file-preview {
+    display: none; align-items: center; gap: 10px;
+    background: var(--light-sage); border: 1px solid #C2D6CC;
+    border-radius: 8px; padding: 10px 14px; margin-top: 10px;
+    font-size: 0.8rem; color: #4A7060;
+  }
+  .file-preview.visible { display: flex; }
+  .file-preview .fname { flex: 1; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .file-preview .remove-file { cursor: pointer; color: var(--text-muted); font-size: 1rem; }
+  .file-preview .remove-file:hover { color: var(--terracotta); }
+
+  .persona-note {
+    background: var(--light-sage); border: 1px solid #C2D6CC;
+    border-radius: 8px; padding: 11px 14px; margin-bottom: 20px;
+    font-size: 0.78rem; color: #4A7060; line-height: 1.5;
+  }
+  .persona-note strong { display: block; margin-bottom: 3px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .generate-btn {
+    width: 100%; padding: 13px; background: var(--warm-brown); color: var(--cream);
+    border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s;
+    margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .generate-btn:hover { background: var(--terracotta); }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .loading-dots { display: none; align-items: center; gap: 5px; }
+  .loading-dots.visible { display: flex; }
+  .loading-dots span { width: 5px; height: 5px; background: var(--cream); border-radius: 50%; animation: bounce 1.2s infinite; }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-4px)} }
+
+  /* Right panel */
+  .placeholder-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; text-align: center; color: var(--text-muted); gap: 12px;
+  }
+  .placeholder-state .icon { font-size: 2.5rem; opacity: 0.3; }
+  .placeholder-state p { font-size: 0.85rem; font-family: 'Fraunces', serif; font-style: italic; font-weight: 300; }
+
+  .output-area { display: none; animation: fadeIn 0.4s ease; }
+  .output-area.visible { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+  /* Referat output */
+  .referat-header {
+    margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border);
+  }
+  .referat-meta {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-muted); font-weight: 500; margin-bottom: 6px;
+  }
+  .referat-title {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 1.3rem;
+    letter-spacing: -0.02em; color: var(--warm-brown); line-height: 1.3; margin-bottom: 6px;
+  }
+  .referat-sub { font-size: 0.8rem; color: var(--text-muted); font-weight: 300; }
+
+  /* Summary box */
+  .summary-box {
+    background: #F0F4F8; border: 1px solid #CBD5E0;
+    border-radius: 10px; padding: 18px 20px; margin-bottom: 24px;
+  }
+  .summary-box .sb-label {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--blue-accent); font-weight: 600; margin-bottom: 8px;
+  }
+  .summary-box p { font-size: 0.85rem; line-height: 1.7; color: var(--warm-brown); font-weight: 300; }
+
+  /* Section */
+  .section { margin-bottom: 24px; }
+  .section-title {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+    font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title.decisions { color: var(--terracotta); }
+  .section-title.actions { color: var(--dusty-sage); }
+  .section-title.topics { color: var(--gold); }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: currentColor; opacity: 0.2; }
+
+  /* Decision cards */
+  .decision-card {
+    background: white; border: 1px solid #F0C8C0;
+    border-left: 3px solid var(--terracotta);
+    border-radius: 8px; padding: 12px 16px; margin-bottom: 8px;
+    font-size: 0.85rem; line-height: 1.6; color: var(--warm-brown);
+  }
+
+  /* Action items */
+  .action-item {
+    background: white; border: 1px solid #C2D6CC;
+    border-left: 3px solid var(--dusty-sage);
+    border-radius: 8px; padding: 12px 16px; margin-bottom: 8px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .action-check {
+    width: 18px; height: 18px; border: 2px solid var(--border);
+    border-radius: 4px; flex-shrink: 0; margin-top: 2px;
+    cursor: pointer; transition: all 0.15s; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .action-check:hover { border-color: var(--dusty-sage); }
+  .action-check.checked { background: var(--dusty-sage); border-color: var(--dusty-sage); }
+  .action-check.checked::after { content: '✓'; color: white; font-size: 0.7rem; font-weight: 700; }
+  .action-content { flex: 1; }
+  .action-text { font-size: 0.85rem; line-height: 1.5; color: var(--warm-brown); margin-bottom: 4px; }
+  .action-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+  .action-owner {
+    font-size: 0.72rem; font-weight: 500; color: var(--blue-accent);
+    background: #EBF0FA; padding: 2px 8px; border-radius: 10px;
+  }
+  .action-deadline {
+    font-size: 0.72rem; color: var(--text-muted);
+    background: #F5F0E8; padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border);
+  }
+
+  /* Topics discussed */
+  .topic-item {
+    background: white; border: 1px solid #E8D9B8;
+    border-left: 3px solid var(--gold);
+    border-radius: 8px; padding: 10px 16px; margin-bottom: 6px;
+    font-size: 0.83rem; line-height: 1.5; color: var(--warm-brown); font-weight: 300;
+  }
+
+  .output-actions {
+    display: flex; gap: 10px; padding-top: 16px; border-top: 1px solid var(--border); margin-top: 8px;
+  }
+  .action-btn {
+    flex: 1; padding: 10px; border-radius: 7px; border: 1px solid var(--border);
+    background: white; font-family: 'DM Sans', sans-serif; font-size: 0.78rem;
+    font-weight: 500; color: var(--warm-brown); cursor: pointer; transition: all 0.15s;
+  }
+  .action-btn:hover { border-color: var(--dusty-sage); background: var(--light-sage); }
+  .action-btn.copied { background: var(--dusty-sage); border-color: var(--dusty-sage); color: white; }
+
+  @media (max-width: 760px) {
+    main { grid-template-columns: 1fr; height: auto; }
+    .panel-left { border-right: none; border-bottom: 1px solid var(--border); }
+    header, .panel { padding: 20px; }
+    header { padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1><span class="dot"></span>Mødereferat</h1>
+    <span class="tagline">Action points & beslutninger</span>
+  </div>
+  <a href="index.html" class="back-link">← Tilbage</a>
+</header>
+
+<main>
+  <!-- LEFT -->
+  <div class="panel panel-left">
+    <div class="panel-label"><span class="dot"></span>Mødeinput</div>
+
+    <div class="persona-note">
+      <strong>Output</strong>
+      Kort opsummering · Beslutninger · Action points med ansvarlig og deadline
+    </div>
+
+    <div class="field-group">
+      <label>Mødetype</label>
+      <select id="meetingType">
+        <option value="team">Teammøde</option>
+        <option value="leadership">Ledelsesmøde</option>
+        <option value="project">Projektmøde</option>
+        <option value="oneone">1:1</option>
+        <option value="kickoff">Kickoff</option>
+        <option value="status">Statusmøde</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label>Mødetitel <span style="color:var(--text-muted);font-weight:300">(valgfri)</span></label>
+      <input type="text" id="meetingTitle" placeholder="F.eks. Q2 Marketing Review" />
+    </div>
+
+    <div class="field-group">
+      <label>Deltagere <span style="color:var(--text-muted);font-weight:300">(valgfri — til action points)</span></label>
+      <input type="text" id="participants" placeholder="F.eks. Stine, Lars, Mette, Jonas" />
+    </div>
+
+    <div class="field-group">
+      <label>Inputmetode</label>
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="switchMode('notes')">📝 Skriv noter</button>
+        <button class="mode-tab" onclick="switchMode('file')">📄 Upload fil</button>
+      </div>
+
+      <div class="input-panel visible" id="panel-notes">
+        <textarea id="notesText" rows="8" placeholder="Indsæt rånoter, bullet points eller transskription fra mødet. Jo mere detalje, jo bedre output.&#10;&#10;F.eks.:&#10;- Kampagne budget godkendt 150k&#10;- Lars tager kontakt til bureau inden fredag&#10;- Diskuterede ny målgruppe strategi — besluttet at teste 25-34 segment i Q2&#10;- Mette laver analyse af konkurrenter inden næste møde"></textarea>
+      </div>
+
+      <div class="input-panel" id="panel-file">
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" accept=".txt,.md,.pdf,.docx" />
+          <div class="dz-icon">📎</div>
+          <div class="dz-text">
+            <strong>Klik for at vælge fil</strong>
+            .txt, .md, .pdf eller .docx
+          </div>
+        </div>
+        <div class="file-preview" id="filePreview">
+          <span>📎</span>
+          <span class="fname" id="fileName"></span>
+          <span class="remove-file" onclick="removeFile()">✕</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="generate-btn" id="generateBtn" onclick="generateReferat()">
+      <span id="btn-label">Lav mødereferat</span>
+      <div class="loading-dots" id="loading"><span></span><span></span><span></span></div>
+    </button>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="panel panel-right">
+    <div class="panel-label"><span class="dot" style="background:var(--dusty-sage)"></span>Dit referat</div>
+
+    <div class="placeholder-state" id="placeholder">
+      <div class="icon">📋</div>
+      <p>Indsæt mødenoter til venstre<br>— så rydder jeg op</p>
+    </div>
+
+    <div class="output-area" id="outputArea">
+      <div class="referat-header">
+        <div class="referat-meta" id="referatMeta"></div>
+        <div class="referat-title" id="referatTitle"></div>
+        <div class="referat-sub" id="referatSub"></div>
+      </div>
+
+      <div class="summary-box" id="summaryBox">
+        <div class="sb-label">⚡ Kort opsummering</div>
+        <p id="summaryText"></p>
+      </div>
+
+      <div class="section" id="decisionsSection">
+        <div class="section-title decisions">Beslutninger</div>
+        <div id="decisionsContainer"></div>
+      </div>
+
+      <div class="section" id="actionsSection">
+        <div class="section-title actions">Action points</div>
+        <div id="actionsContainer"></div>
+      </div>
+
+      <div class="section" id="topicsSection">
+        <div class="section-title topics">Drøftede emner</div>
+        <div id="topicsContainer"></div>
+      </div>
+
+      <div class="output-actions">
+        <button class="action-btn" id="copyBtn" onclick="copyReferat()">Kopiér referat</button>
+        <button class="action-btn" onclick="generateReferat()">Prøv igen</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  let fileContent = '';
+  let currentMode = 'notes';
+  let referatData = null;
+
+  function switchMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-tab').forEach((t, i) => {
+      t.classList.toggle('active', (i === 0 && mode === 'notes') || (i === 1 && mode === 'file'));
+    });
+    document.getElementById('panel-notes').classList.toggle('visible', mode === 'notes');
+    document.getElementById('panel-file').classList.toggle('visible', mode === 'file');
+  }
+
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+  fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+  function handleFile(file) {
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('filePreview').classList.add('visible');
+    const reader = new FileReader();
+    reader.onload = e => { fileContent = e.target.result; };
+    reader.readAsText(file);
+  }
+
+  function removeFile() {
+    fileContent = '';
+    fileInput.value = '';
+    document.getElementById('filePreview').classList.remove('visible');
+  }
+
+  const meetingTypeLabels = {
+    team: 'Teammøde', leadership: 'Ledelsesmøde', project: 'Projektmøde',
+    oneone: '1:1', kickoff: 'Kickoff', status: 'Statusmøde'
+  };
+
+  async function generateReferat() {
+    const notes = document.getElementById('notesText').value.trim();
+    const content = currentMode === 'file' ? fileContent : notes;
+    if (!content) {
+      if (currentMode === 'notes') document.getElementById('notesText').focus();
+      return;
+    }
+
+    const meetingType = document.getElementById('meetingType').value;
+    const meetingTitle = document.getElementById('meetingTitle').value.trim();
+    const participants = document.getElementById('participants').value.trim();
+
+    const btn = document.getElementById('generateBtn');
+    document.getElementById('btn-label').style.display = 'none';
+    document.getElementById('loading').classList.add('visible');
+    btn.disabled = true;
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('outputArea').classList.remove('visible');
+
+    const today = new Date().toLocaleDateString('da-DK', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const systemPrompt = `Du hjælper Stine Franck Jensen med at lave mødereferater. Hun er Marketing Manager og præcis og kvalitetsbevidst af natur.
+
+Outputstil:
+- Kort og præcis — ingen fyld
+- Beslutninger er klare og entydige
+- Action points har altid: hvad, hvem (hvis nævnt), hvornår (hvis nævnt)
+- Opsummering er 2-3 sætninger maks
+- Emner der kun blev drøftet (ikke besluttet) samles under "topics"
+
+Returner KUN valid JSON uden markdown backticks:
+{
+  "title": "mødetitel",
+  "meta": "mødetype · dato · deltagere",
+  "summary": "2-3 sætningers opsummering af mødet",
+  "decisions": ["beslutning 1", "beslutning 2"],
+  "actions": [
+    { "task": "hvad der skal gøres", "owner": "navn eller tom streng", "deadline": "deadline eller tom streng" }
+  ],
+  "topics": ["drøftet emne 1", "drøftet emne 2"]
+}
+
+Hvis et felt ikke har indhold (fx ingen beslutninger), returner en tom array.`;
+
+    const userPrompt = `Mødetype: ${meetingTypeLabels[meetingType]}
+${meetingTitle ? `Titel: ${meetingTitle}` : ''}
+${participants ? `Deltagere: ${participants}` : ''}
+Dato: ${today}
+
+Mødenoter:
+---
+${content.slice(0, 4000)}
+---
+
+Lav et struktureret referat med opsummering, beslutninger, action points og drøftede emner.`;
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }]
+        })
+      });
+
+      const data = await response.json();
+      const text = data.content.map(i => i.text || '').join('');
+      const clean = text.replace(/```json|```/g, '').trim();
+      referatData = JSON.parse(clean);
+
+      renderReferat(referatData);
+      document.getElementById('outputArea').classList.add('visible');
+      document.getElementById('copyBtn').textContent = 'Kopiér referat';
+      document.getElementById('copyBtn').classList.remove('copied');
+
+    } catch(err) {
+      document.getElementById('placeholder').style.display = 'flex';
+      alert('Noget gik galt. Prøv igen.');
+    } finally {
+      btn.disabled = false;
+      document.getElementById('btn-label').style.display = 'inline';
+      document.getElementById('loading').classList.remove('visible');
+    }
+  }
+
+  function renderReferat(d) {
+    document.getElementById('referatMeta').textContent = d.meta;
+    document.getElementById('referatTitle').textContent = d.title;
+    document.getElementById('summaryText').textContent = d.summary;
+
+    // Decisions
+    const decisionsEl = document.getElementById('decisionsContainer');
+    const decisionsSection = document.getElementById('decisionsSection');
+    if (d.decisions && d.decisions.length > 0) {
+      decisionsEl.innerHTML = d.decisions.map(dec => `<div class="decision-card">${dec}</div>`).join('');
+      decisionsSection.style.display = 'block';
+    } else {
+      decisionsSection.style.display = 'none';
+    }
+
+    // Actions
+    const actionsEl = document.getElementById('actionsContainer');
+    const actionsSection = document.getElementById('actionsSection');
+    if (d.actions && d.actions.length > 0) {
+      actionsEl.innerHTML = d.actions.map((a, i) => `
+        <div class="action-item">
+          <div class="action-check" id="check-${i}" onclick="toggleCheck(${i})"></div>
+          <div class="action-content">
+            <div class="action-text">${a.task}</div>
+            <div class="action-meta">
+              ${a.owner ? `<span class="action-owner">👤 ${a.owner}</span>` : ''}
+              ${a.deadline ? `<span class="action-deadline">📅 ${a.deadline}</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('');
+      actionsSection.style.display = 'block';
+    } else {
+      actionsSection.style.display = 'none';
+    }
+
+    // Topics
+    const topicsEl = document.getElementById('topicsContainer');
+    const topicsSection = document.getElementById('topicsSection');
+    if (d.topics && d.topics.length > 0) {
+      topicsEl.innerHTML = d.topics.map(t => `<div class="topic-item">${t}</div>`).join('');
+      topicsSection.style.display = 'block';
+    } else {
+      topicsSection.style.display = 'none';
+    }
+  }
+
+  function toggleCheck(idx) {
+    const el = document.getElementById(`check-${idx}`);
+    el.classList.toggle('checked');
+  }
+
+  function copyReferat() {
+    if (!referatData) return;
+    const d = referatData;
+    let text = `${d.title}\n${d.meta}\n\n`;
+    text += `OPSUMMERING\n${d.summary}\n\n`;
+    if (d.decisions && d.decisions.length) {
+      text += `BESLUTNINGER\n${d.decisions.map(dec => `• ${dec}`).join('\n')}\n\n`;
+    }
+    if (d.actions && d.actions.length) {
+      text += `ACTION POINTS\n${d.actions.map(a => `☐ ${a.task}${a.owner ? ` (${a.owner})` : ''}${a.deadline ? ` — ${a.deadline}` : ''}`).join('\n')}\n\n`;
+    }
+    if (d.topics && d.topics.length) {
+      text += `DRØFTEDE EMNER\n${d.topics.map(t => `• ${t}`).join('\n')}`;
+    }
+
+    navigator.clipboard.writeText(text.trim()).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ Kopieret';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Kopiér referat'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>

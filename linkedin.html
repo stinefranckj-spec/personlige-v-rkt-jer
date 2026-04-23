@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn-opslag — Stine</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --warm-brown: #3D2B1F;
+    --terracotta: #C4614A;
+    --dusty-sage: #7A9E8E;
+    --gold: #C9973B;
+    --light-sage: #EAF0ED;
+    --border: #D8CFC4;
+    --text-muted: #8A7D73;
+    --linkedin-blue: #0A66C2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--warm-brown);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-left { display: flex; align-items: baseline; gap: 14px; }
+
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .tagline {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .back-link {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--terracotta); }
+
+  .dot { width: 8px; height: 8px; background: var(--linkedin-blue); border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    height: calc(100vh - 73px);
+    overflow: hidden;
+  }
+
+  .panel { padding: 32px 36px; overflow-y: auto; }
+  .panel-left { border-right: 1px solid var(--border); }
+
+  .panel-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  .field-group { margin-bottom: 20px; }
+
+  label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    margin-bottom: 7px;
+  }
+
+  textarea, select {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    color: var(--warm-brown);
+    transition: border-color 0.2s;
+    outline: none;
+    resize: none;
+    line-height: 1.6;
+  }
+  textarea:focus, select:focus { border-color: var(--dusty-sage); }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7D73' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+  }
+
+  .tone-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tone-chip {
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: white;
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tone-chip:hover { border-color: var(--dusty-sage); color: var(--warm-brown); }
+  .tone-chip.active { background: var(--dusty-sage); border-color: var(--dusty-sage); color: white; }
+
+  .persona-note {
+    background: var(--light-sage);
+    border: 1px solid #C2D6CC;
+    border-radius: 8px;
+    padding: 11px 14px;
+    margin-bottom: 20px;
+    font-size: 0.78rem;
+    color: #4A7060;
+    line-height: 1.5;
+  }
+  .persona-note strong {
+    display: block; margin-bottom: 3px;
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  .generate-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--warm-brown);
+    color: var(--cream);
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .generate-btn:hover { background: var(--terracotta); }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .loading-dots { display: none; align-items: center; gap: 5px; }
+  .loading-dots.visible { display: flex; }
+  .loading-dots span {
+    width: 5px; height: 5px; background: var(--cream); border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-4px)} }
+
+  .placeholder-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; text-align: center; color: var(--text-muted); gap: 12px;
+  }
+  .placeholder-state .icon { font-size: 2.5rem; opacity: 0.3; }
+  .placeholder-state p { font-size: 0.85rem; font-family: 'Fraunces', serif; font-style: italic; font-weight: 300; }
+
+  .output-area { display: none; animation: fadeIn 0.4s ease; }
+  .output-area.visible { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+  .variant-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .variant-tab {
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: white;
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .variant-tab.active { background: var(--warm-brown); border-color: var(--warm-brown); color: white; }
+
+  .linkedin-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .li-card-header {
+    padding: 16px 20px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .li-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--dusty-sage), var(--terracotta));
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-family: 'Fraunces', serif;
+    font-size: 1.1rem; font-weight: 400; flex-shrink: 0;
+  }
+
+  .li-name { font-size: 0.9rem; font-weight: 500; color: #1a1a1a; }
+  .li-meta { font-size: 0.72rem; color: #888; margin-top: 1px; }
+
+  .li-post-body {
+    padding: 16px 20px 20px;
+    font-size: 0.875rem;
+    line-height: 1.75;
+    color: #1a1a1a;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .li-footer {
+    padding: 8px 20px 12px;
+    display: flex;
+    gap: 18px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .li-reaction {
+    font-size: 0.75rem; color: #888;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .hashtag-row {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 16px;
+  }
+  .hashtag {
+    font-size: 0.75rem; color: var(--linkedin-blue);
+    background: #EBF3FF; padding: 3px 10px;
+    border-radius: 12px; font-weight: 500;
+  }
+
+  .tip-box {
+    background: #FEF9F0;
+    border: 1px solid #F0D9B0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 0.78rem;
+    color: #7A5A20;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .tip-box strong {
+    display: block; margin-bottom: 4px;
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  .output-actions {
+    display: flex; gap: 10px;
+    padding-top: 16px; border-top: 1px solid var(--border);
+  }
+  .action-btn {
+    flex: 1; padding: 10px; border-radius: 7px;
+    border: 1px solid var(--border); background: white;
+    font-family: 'DM Sans', sans-serif; font-size: 0.78rem;
+    font-weight: 500; color: var(--warm-brown); cursor: pointer; transition: all 0.15s;
+  }
+  .action-btn:hover { border-color: var(--dusty-sage); background: var(--light-sage); }
+  .action-btn.copied { background: var(--dusty-sage); border-color: var(--dusty-sage); color: white; }
+
+  @media (max-width: 760px) {
+    main { grid-template-columns: 1fr; height: auto; }
+    .panel-left { border-right: none; border-bottom: 1px solid var(--border); }
+    header, .panel { padding: 20px; }
+    header { padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1><span class="dot"></span>LinkedIn-opslag</h1>
+    <span class="tagline">Skriver som dig</span>
+  </div>
+  <a href="index.html" class="back-link">← Tilbage</a>
+</header>
+
+<main>
+  <!-- LEFT -->
+  <div class="panel panel-left">
+    <div class="panel-label"><span class="dot"></span>Hvad vil du dele?</div>
+
+    <div class="persona-note">
+      <strong>Din LinkedIn-stemme</strong>
+      Autentisk og direkte · Fagligt funderet · Varm uden at være sentimental · Altid med et klart budskab
+    </div>
+
+    <div class="field-group">
+      <label>Type opslag</label>
+      <select id="postType">
+        <option value="insight">Faglig indsigt eller holdning</option>
+        <option value="result">Projekt eller resultat</option>
+        <option value="reflection">Personlig refleksion fra arbejdslivet</option>
+        <option value="tip">Praktisk tip eller lærdom</option>
+        <option value="question">Spørgsmål til netværket</option>
+        <option value="announcement">Nyhed eller annoncering</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label>Hvad handler det om? <span style="color:var(--text-muted);font-weight:300">(noter eller stikord)</span></label>
+      <textarea id="topic" rows="5" placeholder="F.eks.: Vi lancerede ny kampagne i Q1. Brugte data til at målrette anderledes end før. Resulterede i 40% højere engagement. Lærte at simplificere budskabet hurtigere."></textarea>
+    </div>
+
+    <div class="field-group">
+      <label>Tone</label>
+      <div class="tone-chips">
+        <button class="tone-chip active" data-tone="authentic">Autentisk & direkte</button>
+        <button class="tone-chip" data-tone="inspiring">Inspirerende</button>
+        <button class="tone-chip" data-tone="analytical">Analytisk & faglig</button>
+        <button class="tone-chip" data-tone="humble">Ydmyg & reflekterende</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Længde</label>
+      <select id="length">
+        <option value="short">Kort — 3–5 linjer, skarpt budskab</option>
+        <option value="medium" selected>Medium — 6–10 linjer, lidt kontekst</option>
+        <option value="long">Langt — 12–16 linjer, fortæller en historie</option>
+      </select>
+    </div>
+
+    <button class="generate-btn" id="generateBtn" onclick="generatePost()">
+      <span id="btn-label">Skriv LinkedIn-opslag</span>
+      <div class="loading-dots" id="loading"><span></span><span></span><span></span></div>
+    </button>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="panel panel-right">
+    <div class="panel-label"><span class="dot" style="background:var(--dusty-sage)"></span>Dit opslag</div>
+
+    <div class="placeholder-state" id="placeholder">
+      <div class="icon">💼</div>
+      <p>Beskriv hvad du vil dele<br>— så skriver jeg det som dig</p>
+    </div>
+
+    <div class="output-area" id="outputArea">
+      <div class="variant-tabs" id="variantTabs"></div>
+
+      <div class="linkedin-card">
+        <div class="li-card-header">
+          <div class="li-avatar">S</div>
+          <div>
+            <div class="li-name">Stine Franck Jensen</div>
+            <div class="li-meta">Marketing Manager · lige nu</div>
+          </div>
+        </div>
+        <div class="li-post-body" id="postBody"></div>
+        <div class="li-footer">
+          <span class="li-reaction">👍 Synes godt om</span>
+          <span class="li-reaction">💬 Kommentér</span>
+          <span class="li-reaction">↗ Del</span>
+        </div>
+      </div>
+
+      <div class="hashtag-row" id="hashtagRow"></div>
+      <div class="tip-box" id="tipBox"></div>
+
+      <div class="output-actions">
+        <button class="action-btn" id="copyBtn" onclick="copyPost()">Kopiér opslag</button>
+        <button class="action-btn" onclick="generatePost()">Prøv igen</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  document.querySelectorAll('.tone-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.tone-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  let variants = [];
+  let activeVariant = 0;
+
+  const toneDesc = {
+    'authentic': 'autentisk og direkte — ægte stemme, ingen klicheer, taler fra egne erfaringer',
+    'inspiring': 'inspirerende og energisk — motiverer læseren uden at være selvhøjtidelig',
+    'analytical': 'analytisk og faglig — fremhæver indsigter og data på en tilgængelig måde',
+    'humble': 'ydmyg og reflekterende — deler hvad hun har lært, inkl. fejl og tvivl'
+  };
+
+  const lengthDesc = {
+    'short': '3–5 linjer. Skarpt og præcist. Ét klart budskab.',
+    'medium': '6–10 linjer. Lidt kontekst, klart budskab, stærk afslutning.',
+    'long': '12–16 linjer. Fortæller en mini-historie med start, midte og slutning.'
+  };
+
+  const typeDesc = {
+    insight: 'faglig indsigt eller holdning',
+    result: 'projekt eller opnået resultat',
+    reflection: 'personlig refleksion fra arbejdslivet',
+    tip: 'praktisk tip eller lærdom',
+    question: 'spørgsmål til netværket',
+    announcement: 'nyhed eller annoncering'
+  };
+
+  async function generatePost() {
+    const topic = document.getElementById('topic').value.trim();
+    if (!topic) { document.getElementById('topic').focus(); return; }
+
+    const postType = document.getElementById('postType').value;
+    const tone = document.querySelector('.tone-chip.active').dataset.tone;
+    const length = document.getElementById('length').value;
+
+    const btn = document.getElementById('generateBtn');
+    document.getElementById('btn-label').style.display = 'none';
+    document.getElementById('loading').classList.add('visible');
+    btn.disabled = true;
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('outputArea').classList.remove('visible');
+
+    const systemPrompt = `Du er Stine Franck Jensen, Marketing Manager. Du skriver LinkedIn-opslag i din egen stemme på dansk.
+
+Din LinkedIn-personlighed:
+- Direkte og autentisk — du skriver som du taler, ingen corporate-speak
+- Fagligt funderet med substans og konkrete erfaringer
+- Varm men ikke sentimental
+- Resultatorienteret — peger på hvad der virker og hvorfor
+- Selvsikker men ikke arrogant — deler mening, inviterer til dialog
+
+LinkedIn-regler:
+- Åbn med en stærk første linje — den eneste folk ser uden at klikke
+- Brug linjeskift generøst — teksten skal ånde
+- Ingen klicheer som "Jeg er stolt af at dele..." eller "Super spændt for at..."
+- Afslut gerne med et spørgsmål eller en invitation
+- Hashtags leveres SEPARAT — IKKE inde i opslagsteksten
+- Max én emoji og kun hvis den er naturlig
+
+Returner KUN valid JSON uden markdown backticks:
+{"variants":[{"label":"Version A","post":"tekst med linjeskift som \\n","hashtags":["tag1","tag2","tag3"],"tip":"Kort coaching-note til Stine om denne version"},{"label":"Version B","post":"alternativ vinkel","hashtags":["tag1","tag2"],"tip":"Coaching-note til Version B"}]}`;
+
+    const userPrompt = `Skriv 2 versioner af et LinkedIn-opslag.
+Type: ${typeDesc[postType]}
+Tone: ${toneDesc[tone]}
+Længde: ${lengthDesc[length]}
+
+Emne:
+${topic}
+
+Version A og B skal have forskellig åbningslinje og vinkel — reelle alternativer, ikke bare omformuleret.`;
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }]
+        })
+      });
+
+      const data = await response.json();
+      const text = data.content.map(i => i.text || '').join('');
+      const clean = text.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+      variants = parsed.variants;
+      activeVariant = 0;
+
+      buildVariantTabs();
+      showVariant(0);
+      document.getElementById('outputArea').classList.add('visible');
+
+    } catch(err) {
+      document.getElementById('placeholder').style.display = 'flex';
+      alert('Noget gik galt. Prøv igen.');
+    } finally {
+      btn.disabled = false;
+      document.getElementById('btn-label').style.display = 'inline';
+      document.getElementById('loading').classList.remove('visible');
+    }
+  }
+
+  function buildVariantTabs() {
+    const tabs = document.getElementById('variantTabs');
+    tabs.innerHTML = '';
+    variants.forEach((v, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'variant-tab' + (i === 0 ? ' active' : '');
+      btn.textContent = v.label;
+      btn.onclick = () => { activeVariant = i; showVariant(i); };
+      tabs.appendChild(btn);
+    });
+  }
+
+  function showVariant(idx) {
+    document.querySelectorAll('.variant-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+    const v = variants[idx];
+    document.getElementById('postBody').textContent = v.post;
+    const hashRow = document.getElementById('hashtagRow');
+    hashRow.innerHTML = v.hashtags.map(h => `<span class="hashtag">#${h.replace(/^#/, '')}</span>`).join('');
+    document.getElementById('tipBox').innerHTML = `<strong>💡 Coaching-note</strong>${v.tip}`;
+    document.getElementById('copyBtn').textContent = 'Kopiér opslag';
+    document.getElementById('copyBtn').classList.remove('copied');
+  }
+
+  function copyPost() {
+    const v = variants[activeVariant];
+    const hashtags = v.hashtags.map(h => `#${h.replace(/^#/, '')}`).join(' ');
+    navigator.clipboard.writeText(`${v.post}\n\n${hashtags}`).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ Kopieret';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Kopiér opslag'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>

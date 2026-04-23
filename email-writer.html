@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stine's Email Writer</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --warm-brown: #3D2B1F;
+    --terracotta: #C4614A;
+    --dusty-sage: #7A9E8E;
+    --gold: #C9973B;
+    --light-sage: #EAF0ED;
+    --border: #D8CFC4;
+    --text-muted: #8A7D73;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--warm-brown);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 28px 40px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    color: var(--warm-brown);
+  }
+
+  header .tagline {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    background: var(--terracotta);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    max-height: calc(100vh - 77px);
+  }
+
+  .panel {
+    padding: 36px 40px;
+    overflow-y: auto;
+  }
+
+  .panel-left {
+    border-right: 1px solid var(--border);
+  }
+
+  .panel-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  .field-group {
+    margin-bottom: 22px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--warm-brown);
+    margin-bottom: 7px;
+    letter-spacing: 0.01em;
+  }
+
+  textarea, select, input[type="text"] {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    color: var(--warm-brown);
+    transition: border-color 0.2s;
+    outline: none;
+    resize: none;
+  }
+
+  textarea:focus, select:focus, input[type="text"]:focus {
+    border-color: var(--dusty-sage);
+  }
+
+  textarea { line-height: 1.6; }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7D73' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+  }
+
+  .tone-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tone-chip {
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: white;
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tone-chip:hover {
+    border-color: var(--dusty-sage);
+    color: var(--warm-brown);
+  }
+
+  .tone-chip.active {
+    background: var(--dusty-sage);
+    border-color: var(--dusty-sage);
+    color: white;
+  }
+
+  .generate-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--warm-brown);
+    color: var(--cream);
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .generate-btn:hover {
+    background: var(--terracotta);
+  }
+
+  .generate-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Right panel - output */
+  .output-area {
+    min-height: 200px;
+    position: relative;
+  }
+
+  .placeholder-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    text-align: center;
+    color: var(--text-muted);
+    gap: 12px;
+  }
+
+  .placeholder-state .icon {
+    font-size: 2.5rem;
+    opacity: 0.3;
+  }
+
+  .placeholder-state p {
+    font-size: 0.85rem;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  .email-output {
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .email-output.visible {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .email-subject {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .email-subject-value {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--warm-brown);
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.4;
+  }
+
+  .email-body {
+    font-size: 0.875rem;
+    line-height: 1.8;
+    color: var(--warm-brown);
+    white-space: pre-wrap;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+  }
+
+  .output-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .action-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--warm-brown);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+  }
+
+  .action-btn:hover {
+    border-color: var(--dusty-sage);
+    background: var(--light-sage);
+  }
+
+  .action-btn.copy-btn.copied {
+    background: var(--dusty-sage);
+    border-color: var(--dusty-sage);
+    color: white;
+  }
+
+  .loading-dots {
+    display: none;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .loading-dots.visible {
+    display: flex;
+  }
+
+  .loading-dots span {
+    width: 5px; height: 5px;
+    background: var(--cream);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-4px); }
+  }
+
+  .persona-note {
+    background: var(--light-sage);
+    border: 1px solid #C2D6CC;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 24px;
+    font-size: 0.78rem;
+    color: #4A7060;
+    line-height: 1.5;
+  }
+
+  .persona-note strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  @media (max-width: 700px) {
+    main { grid-template-columns: 1fr; max-height: none; }
+    .panel-left { border-right: none; border-bottom: 1px solid var(--border); }
+    header { padding: 20px 20px 16px; }
+    .panel { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="dot"></span>Stines Mailassistent</h1>
+  <span class="tagline">Skriver som dig</span>
+</header>
+
+<main>
+  <!-- LEFT: Input -->
+  <div class="panel panel-left">
+    <div class="panel-label"><span class="dot" style="background:var(--gold)"></span>Hvad skal sendes?</div>
+
+    <div class="persona-note">
+      <strong>Din skrivestil</strong>
+      Direkte og varm · Empatisk og relationsbevidst · Præcis og kvalitetsorienteret · Ærlig og resultatorienteret
+    </div>
+
+    <div class="field-group">
+      <label>Modtager</label>
+      <select id="recipient">
+        <option value="colleague">Kollega</option>
+        <option value="manager">Leder / chef</option>
+        <option value="team">Team / gruppe</option>
+        <option value="external">Ekstern samarbejdspartner</option>
+        <option value="client">Kunde / klient</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label>Formål med mailen</label>
+      <select id="purpose">
+        <option value="followup">Opfølgning</option>
+        <option value="request">Anmodning / spørgsmål</option>
+        <option value="feedback">Give feedback</option>
+        <option value="update">Status / opdatering</option>
+        <option value="decline">Afslå eller sige nej</option>
+        <option value="introduction">Introduktion</option>
+        <option value="thanks">Tak / anerkendelse</option>
+        <option value="other">Andet</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label>Hvad vil du sige? <span style="color:var(--text-muted);font-weight:300">(stikord eller sætninger)</span></label>
+      <textarea id="context" rows="5" placeholder="F.eks.: Vil høre om mødet fra i mandags er rykket. Vi skal have styr på dagsordenen inden torsdag."></textarea>
+    </div>
+
+    <div class="field-group">
+      <label>Tone</label>
+      <div class="tone-chips">
+        <button class="tone-chip active" data-tone="professional-warm">Professionel & varm</button>
+        <button class="tone-chip" data-tone="direct">Direkte & kontant</button>
+        <button class="tone-chip" data-tone="friendly">Uformel & venlig</button>
+        <button class="tone-chip" data-tone="firm">Fast & tydelig</button>
+        <button class="tone-chip" data-tone="appreciative">Anerkendende</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Sprog</label>
+      <select id="language">
+        <option value="danish">Dansk</option>
+        <option value="english">Engelsk</option>
+      </select>
+    </div>
+
+    <button class="generate-btn" id="generateBtn" onclick="generateEmail()">
+      <span id="btn-label">Skriv mail som Stine</span>
+      <div class="loading-dots" id="loading">
+        <span></span><span></span><span></span>
+      </div>
+    </button>
+  </div>
+
+  <!-- RIGHT: Output -->
+  <div class="panel panel-right">
+    <div class="panel-label"><span class="dot" style="background:var(--dusty-sage)"></span>Din mail</div>
+
+    <div class="output-area">
+      <div class="placeholder-state" id="placeholder">
+        <div class="icon">✉</div>
+        <p>Udfyld felterne til venstre<br>og klik på knappen</p>
+      </div>
+
+      <div class="email-output" id="emailOutput">
+        <div class="email-subject">Emnelinje</div>
+        <div class="email-subject-value" id="outputSubject"></div>
+        <div class="email-body" id="outputBody"></div>
+        <div class="output-actions">
+          <button class="action-btn copy-btn" id="copyBtn" onclick="copyEmail()">Kopiér mail</button>
+          <button class="action-btn" onclick="generateEmail()">Prøv igen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  // Tone chip selection
+  document.querySelectorAll('.tone-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.tone-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  function getActiveTone() {
+    const chip = document.querySelector('.tone-chip.active');
+    return chip ? chip.dataset.tone : 'professional-warm';
+  }
+
+  const toneDescriptions = {
+    'professional-warm': 'professionel men varm og menneskelig – tydelig, men aldrig kold',
+    'direct': 'direkte og kontant – få ord, klar besked, ingen snak rundt om grøden',
+    'friendly': 'uformel og venlig – som at skrive til en god kollega du kender godt',
+    'firm': 'fast og tydelig – ingen tvivl om, hvad der forventes eller menes',
+    'appreciative': 'anerkendende og oprigtig – varm, men ikke overdreven'
+  };
+
+  const recipientLabels = {
+    colleague: 'en kollega',
+    manager: 'din leder eller chef',
+    team: 'dit team',
+    external: 'en ekstern samarbejdspartner',
+    client: 'en kunde eller klient'
+  };
+
+  const purposeLabels = {
+    followup: 'opfølgning',
+    request: 'anmodning eller spørgsmål',
+    feedback: 'give feedback',
+    update: 'statusopdatering',
+    decline: 'at afslå eller sige nej',
+    introduction: 'introduktion',
+    thanks: 'takke eller anerkende',
+    other: 'generel kommunikation'
+  };
+
+  async function generateEmail() {
+    const context = document.getElementById('context').value.trim();
+    if (!context) {
+      document.getElementById('context').focus();
+      return;
+    }
+
+    const recipient = document.getElementById('recipient').value;
+    const purpose = document.getElementById('purpose').value;
+    const tone = getActiveTone();
+    const language = document.getElementById('language').value;
+    const langInstruction = language === 'danish' ? 'Skriv på dansk.' : 'Write in English.';
+
+    const btn = document.getElementById('generateBtn');
+    const btnLabel = document.getElementById('btn-label');
+    const loading = document.getElementById('loading');
+    btn.disabled = true;
+    btnLabel.style.display = 'none';
+    loading.classList.add('visible');
+
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('emailOutput').classList.remove('visible');
+
+    const systemPrompt = `Du er Stine Franck Jensen, Marketing Manager. Du skriver professionelle mails på vegne af dig selv.
+
+Din personlighed baseret på en e-interpersonal personlighedstest:
+- Direkte og handlekraftig: Du deler din ærlige mening, træffer beslutninger relativt hurtigt og trives med at sætte mål
+- Varm og empatisk: Du er meget menneskeorienteret, god til at lytte, og du sørger for at tage hensyn til andre
+- Præcis og kvalitetsbevidst: Du er omhyggelig af natur, foretrækker at gøre tingene rigtigt frem for hurtigt
+- Relationsorienteret: Det er vigtigt for dig at have gode relationer, du er loyal og skaber harmoni
+- Selvsikker men ikke arrogant: Du tror på dine evner og tager ansvar, men giver plads til andres bidrag
+- Du er udadvendt men ikke overdreven – du bidrager til samtalen uden at dominere den
+
+Skrivestil:
+- Varm men direkte – ingen unødvendig snak, men aldrig kold
+- Bruger "jeg" naturligt og personligt
+- Konkret og tydelig – ingen tvetydighed
+- Behøver ikke at bekræfte alt to gange
+- Slutter naturligt – signerer med "Med venlig hilsen\nStine" (eller på engelsk: "Best regards\nStine")
+
+Outputformat – returner KUN dette JSON (ingen markdown backticks, ingen forklaring):
+{"subject": "emnelinje her", "body": "brødtekst her med \\n for linjeskift"}`;
+
+    const userPrompt = `${langInstruction}
+
+Skriv en mail til ${recipientLabels[recipient]} med formålet: ${purposeLabels[purpose]}.
+Tone: ${toneDescriptions[tone]}.
+
+Indhold / hvad mailen skal handle om:
+${context}
+
+Husk: Skriv som Stine – præcis, varm, direkte. Ikke for lang.`;
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{ role: 'user', content: userPrompt }],
+          system: systemPrompt
+        })
+      });
+
+      const data = await response.json();
+      const text = data.content.map(i => i.text || '').join('');
+      const clean = text.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+
+      document.getElementById('outputSubject').textContent = parsed.subject;
+      document.getElementById('outputBody').textContent = parsed.body;
+      document.getElementById('emailOutput').classList.add('visible');
+      document.getElementById('copyBtn').textContent = 'Kopiér mail';
+      document.getElementById('copyBtn').classList.remove('copied');
+
+    } catch (err) {
+      document.getElementById('placeholder').style.display = 'flex';
+      alert('Noget gik galt. Prøv igen.');
+    } finally {
+      btn.disabled = false;
+      btnLabel.style.display = 'inline';
+      loading.classList.remove('visible');
+    }
+  }
+
+  function copyEmail() {
+    const subject = document.getElementById('outputSubject').textContent;
+    const body = document.getElementById('outputBody').textContent;
+    const full = `Emne: ${subject}\n\n${body}`;
+    navigator.clipboard.writeText(full).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ Kopieret';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Kopiér mail';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // Enter shortcut in textarea
+  document.getElementById('context').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.metaKey) generateEmail();
+  });
+</script>
+
+</body>
+</html>
