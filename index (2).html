@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mit Marketing Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --warm-brown: #3D2B1F;
+    --terracotta: #C4614A;
+    --dusty-sage: #7A9E8E;
+    --border: #D8CFC4;
+    --text-muted: #8A7D73;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background-color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--warm-brown);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-box {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 48px 44px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+  }
+  .dot {
+    width: 10px; height: 10px;
+    background: var(--terracotta);
+    border-radius: 50%;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 32px;
+  }
+  input[type="password"] {
+    width: 100%;
+    background: #FDFAF6;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--warm-brown);
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: center;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+  input[type="password"]:focus { border-color: var(--dusty-sage); }
+  .login-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--warm-brown);
+    color: #F5F0E8;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .login-btn:hover { background: var(--terracotta); }
+  .error {
+    display: none;
+    font-size: 0.78rem;
+    color: var(--terracotta);
+    margin-top: 10px;
+  }
+  .error.visible { display: block; }
+</style>
+</head>
+<body>
+<div class="login-box">
+  <div class="dot"></div>
+  <h1>Mit Marketing Hub</h1>
+  <p class="subtitle">Indtast password for at fortsætte</p>
+  <input type="password" id="passwordInput" placeholder="Password" autofocus />
+  <button class="login-btn" onclick="checkPassword()">Log ind</button>
+  <div class="error" id="errorMsg">Forkert password — prøv igen</div>
+</div>
+<script>
+  function checkPassword() {
+    const input = document.getElementById('passwordInput').value;
+    if (input === 'Wizkids347') {
+      sessionStorage.setItem('auth', 'true');
+      window.location.href = 'home.html';
+    } else {
+      document.getElementById('errorMsg').classList.add('visible');
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('passwordInput').focus();
+    }
+  }
+  document.getElementById('passwordInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkPassword();
+  });
+</script>
+</body>
+</html>
